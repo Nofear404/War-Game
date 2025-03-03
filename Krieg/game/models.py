@@ -124,7 +124,6 @@ class Game:
                     temp.append(spieler2.spielerqueue.pop(0))
                     
 
-
             if (
                 self.kartendeck[spieler1.spielerqueue[0]]
                 > self.kartendeck[spieler2.spielerqueue[0]]
