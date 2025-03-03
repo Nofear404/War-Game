@@ -113,11 +113,17 @@ class Game:
                 self.kartendeck[spieler1.spielerqueue[0]]
                 == self.kartendeck[spieler2.spielerqueue[0]]
             ):
-
-                # Counter einbauen
-                for i in range(0, 3):
+                if((len(spieler1.spielerqueue) >= 3 and len(spieler2.spielerqueue) >= 3)):
+                    # Counter einbauen
+                    for i in range(0, 3):
+                        temp.append(spieler1.spielerqueue.pop(0))
+                        temp.append(spieler2.spielerqueue.pop(0))
+                
+                else:
                     temp.append(spieler1.spielerqueue.pop(0))
                     temp.append(spieler2.spielerqueue.pop(0))
+                    
+
 
             if (
                 self.kartendeck[spieler1.spielerqueue[0]]
@@ -127,16 +133,16 @@ class Game:
                 # hinzufügen ins neue deck von Spieler 1 und aus aktuell deck pop()
                 spieler1.cards_won.append(spieler1.spielerqueue.pop(0))
                 spieler1.cards_won.append(spieler2.spielerqueue.pop(0))
+                spieler1.cards_won.append(temp)
 
-            elif (
-                self.kartendeck[spieler1.spielerqueue[0]]
-                < self.kartendeck[spieler2.spielerqueue[0]]
-            ):
+            else:
 
                 # hinzufügen ins neue deck von Spieler 1 und aus aktuell deck pop()
                 spieler2.cards_won.append(spieler1.spielerqueue.pop(0))
                 spieler2.cards_won.append(spieler2.spielerqueue.pop(0))
+                spieler2.cards_won.append(temp)
 
+            temp = []
 
 test = Game("Dan", "Selman")
 test.gamestart()
