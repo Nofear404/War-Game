@@ -138,15 +138,15 @@ class Game:
                             temp.append(spieler2.spielerqueue.pop(0))
                         
                         #neuer Stapel machen
-                        spieler1.spielerqueue = self.new_deck(spieler1.spielerqueue, spieler1.cards_won)  # 🔴 FIX HIER
-                        spieler2.spielerqueue = self.new_deck(spieler2.spielerqueue, spieler2.cards_won)  # 🔴 FIX HIER
+                        spieler1.spielerqueue = self.new_deck(spieler1.spielerqueue, spieler1.cards_won)  
+                        spieler2.spielerqueue = self.new_deck(spieler2.spielerqueue, spieler2.cards_won)  
                         temp.clear()  
 
                 if len(spieler1.spielerqueue) == 0:
-                    spieler1.spielerqueue = self.new_deck(spieler1.spielerqueue, spieler1.cards_won)  # 🔴 FIX HIER
+                    spieler1.spielerqueue = self.new_deck(spieler1.spielerqueue, spieler1.cards_won)  
                 
                 if len(spieler2.spielerqueue) == 0:
-                    spieler2.spielerqueue = self.new_deck(spieler2.spielerqueue, spieler2.cards_won)  # 🔴 FIX HIER
+                    spieler2.spielerqueue = self.new_deck(spieler2.spielerqueue, spieler2.cards_won)  
 
         if len(spieler1.spielerqueue) + len(spieler1.cards_won) > 0:
             print(f"{spieler1.name} hat gewonnen")
