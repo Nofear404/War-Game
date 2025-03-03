@@ -80,54 +80,60 @@ class Spieler:
 
 
 class Game:
-    def __init__(self, player_1, player_2):
+    def __init__(self, player_1: str, player_2: str):
         self.s_name1 = Spieler(player_1)
         self.s_name2 = Spieler(player_2)
 
-    def karten_mischen(self):
-
-        # benutze das Dictionary aus Klasse Kartendeck
-        self.kartendeck = Kartendeck().karten_dict
+    def karten_mischen(self, deck_keys):
 
         # in Liste umwandeln umzu mischen
-        items = list(self.kartendeck.keys())
+        items = list(deck_keys)
 
         # mischen
         random.shuffle(items)
 
         return items
 
-    def gamestart(self):
-        # jeder Spieler bekommt 26 Karten in Form von einer Queue
-        # Karten müssen gemischt sein
-        deck = self.karten_mischen()
-        self.s_name1.spielerqueue = deck[:26]
-        self.s_name2.spielerqueue = deck[26:]
+    def new_deck(self, old_deck: list, won_cards: list):
+        for i in won_cards:
+            old_deck.append(i)
+        old_deck = self.karten_mischen(self.deck)
+        won_cards = []
 
-    def kriegregeln(self, spieler1, spieler2):
-        while len(spieler1.spielerqueue) >= 0 and len(spieler2.spielerqueue):
-            # Dict für 6 Karten
-            temp = []
+    def kriegregeln(self, spieler1: Spieler, spieler2: Spieler):
+        # Dict für 6 Karten
+        temp = []
+        counter = 0
+        while (len(spieler1.spielerqueue) and len(spieler2.spielerqueue)) or (
+            len(spieler1.cards_won) and len(spieler2.cards_won)
+        ):
+            counter += 1
+            print(counter)
+            try:
+                spieler1.spielerqueue.remove([])
+                spieler2.spielerqueue.remove([])
+            except ValueError:
+                pass
 
             while (
-                self.kartendeck[spieler1.spielerqueue[0]]
-                == self.kartendeck[spieler2.spielerqueue[0]]
+                Kartendeck().karten_dict[spieler1.spielerqueue[0]]
+                == Kartendeck().karten_dict[spieler2.spielerqueue[0]]
             ):
-                if((len(spieler1.spielerqueue) >= 3 and len(spieler2.spielerqueue) >= 3)):
+                if len(spieler1.spielerqueue) >= 3 and len(spieler2.spielerqueue) >= 3:
                     # Counter einbauen
                     for i in range(0, 3):
                         temp.append(spieler1.spielerqueue.pop(0))
                         temp.append(spieler2.spielerqueue.pop(0))
-                
+
                 else:
                     temp.append(spieler1.spielerqueue.pop(0))
                     temp.append(spieler2.spielerqueue.pop(0))
-                    
-
+                    self.new_deck(spieler1.spielerqueue, spieler1.cards_won)
+                    self.new_deck(spieler2.spielerqueue, spieler2.cards_won)
 
             if (
-                self.kartendeck[spieler1.spielerqueue[0]]
-                > self.kartendeck[spieler2.spielerqueue[0]]
+                Kartendeck().karten_dict[spieler1.spielerqueue[0]]
+                > Kartendeck().karten_dict[spieler2.spielerqueue[0]]
             ):
 
                 # hinzufügen ins neue deck von Spieler 1 und aus aktuell deck pop()
@@ -142,9 +148,32 @@ class Game:
                 spieler2.cards_won.append(spieler2.spielerqueue.pop(0))
                 spieler2.cards_won.append(temp)
 
+            if len(spieler1.spielerqueue) == 0:
+                spieler1.spielerqueue = spieler1.cards_won
+                random.shuffle(spieler1.spielerqueue)
+                spieler1.cards_won = []
+
+            if len(spieler2.spielerqueue) == 0:
+                spieler2.spielerqueue = spieler2.cards_won
+                random.shuffle(spieler2.spielerqueue)
+                spieler2.cards_won = []
+
             temp = []
+        if (len(spieler1.spielerqueue) + len(spieler1.cards_won)) != 0:
+            print(f"{spieler1.name} hat gewonnen")
+            return f"{spieler1.name} gewonnen!"
+        else:
+            print(f"{spieler2.name} hat gewonnen")
+            return f"{spieler2.name} hat gewonnen!"
+
+    def gamestart(self):
+        # jeder Spieler bekommt 26 Karten in Form von einer Queue
+        # Karten müssen gemischt sein
+        self.deck = self.karten_mischen(Kartendeck().karten_dict.keys())
+        self.s_name1.spielerqueue = self.deck[:26]
+        self.s_name2.spielerqueue = self.deck[26:]
+        self.kriegregeln(self.s_name1, self.s_name2)
+
 
 test = Game("Dan", "Selman")
 test.gamestart()
-print(test.s_name1.spielerqueue)
-print(test.s_name2.spielerqueue)
