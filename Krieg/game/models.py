@@ -75,7 +75,8 @@ class Kartendeck:
 class Spieler:
     def __init__(self, name):
         self.name = name
-        self.spielerqueue = 0
+        self.spielerqueue = []
+        self.cards_won = []
 
 
 class Game:
@@ -86,10 +87,10 @@ class Game:
     def karten_mischen(self):
 
         # benutze das Dictionary aus Klasse Kartendeck
-        kartendeck = Kartendeck().karten_dict
+        self.kartendeck = Kartendeck().karten_dict
 
         # in Liste umwandeln umzu mischen
-        items = list(kartendeck.keys())
+        items = list(self.kartendeck.keys())
 
         # mischen
         random.shuffle(items)
@@ -102,9 +103,41 @@ class Game:
         deck = self.karten_mischen()
         self.s_name1.spielerqueue = deck[:26]
         self.s_name2.spielerqueue = deck[26:]
+    
 
-    def kriegregeln(self):
-        pass
+    def kriegregeln(self, spieler1, spieler2):
+        while (len(spieler1.spielerqueue) >= 0 and len(spieler2.spielerqueue)):
+            if (self.kartendeck[spieler1.spielerqueue[0]] > self.kartendeck[spieler2.spielerqueue[0]]):
+
+                #hinzufügen ins neue deck von Spieler 1 und aus aktuell deck pop()
+                spieler1.cards_won.append(spieler1.spielerqueue.pop(0))
+                spieler1.cards_won.append(spieler2.spielerqueue.pop(0))
+
+            elif(self.kartendeck[spieler1.spielerqueue[0]] < self.kartendeck[spieler2.spielerqueue[0]]):
+
+                #hinzufügen ins neue deck von Spieler 1 und aus aktuell deck pop()
+                spieler2.cards_won.append(spieler1.spielerqueue.pop(0))
+                spieler2.cards_won.append(spieler2.spielerqueue.pop(0))
+
+            else:
+                # Dict für 6 Karten 
+                temp = [] 
+                
+                while (self.kartendeck[spieler1.spielerqueue[0]] == self.kartendeck[spieler2.spielerqueue[0]]):
+     
+
+                    #Counter einbauen 
+                    for i in range(0, 3):
+                        temp.append(spieler1.spielerqueue.pop(0))
+                        temp.append(spieler2.spielerqueue.pop(0))
+                    
+                    
+                
+
+
+            
+        
+        
 
 
 test = Game("Dan", "Selman")
