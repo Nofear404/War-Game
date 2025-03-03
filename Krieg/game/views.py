@@ -1,5 +1,9 @@
-from django.shortcuts import render
 from django.http import HttpResponse
+from django.template import loader
+from .models import Game
 
-def members(request):
-    return HttpResponse("Hello !")
+
+def gaming(request):
+    game = Game("Selman", "Dan").gamestart()
+
+    return HttpResponse(game)

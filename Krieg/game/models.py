@@ -79,7 +79,7 @@ class Spieler:
         self.cards_won = []
 
 
-class Game:
+class Game(models.Model):
     def __init__(self, player_1: str, player_2: str):
         self.s_name1 = Spieler(player_1)
         self.s_name2 = Spieler(player_2)
@@ -95,58 +95,78 @@ class Game:
         return items
 
     def new_deck(self, old_deck: list, won_cards: list):
-        old_deck.extend(won_cards) # Selman - besser extend als append 
-        won_cards.clear()  
+        old_deck.extend(won_cards)  # Selman - besser extend als append
+        won_cards.clear()
         return self.karten_mischen(old_deck)
 
     def kriegregeln(self, spieler1: Spieler, spieler2: Spieler):
 
-        # Dict für Unentschieden 
+        # Dict für Unentschieden
         temp = []
 
-        #While Schleife für ein Spiel
-        while len(spieler1.spielerqueue) + len(spieler1.cards_won) > 0 and len(spieler2.spielerqueue) + len(spieler2.cards_won) > 0:
+        # While Schleife für ein Spiel
+        while (
+            len(spieler1.spielerqueue) + len(spieler1.cards_won) > 0
+            and len(spieler2.spielerqueue) + len(spieler2.cards_won) > 0
+        ):
 
-            #While Schleife für eine Runde
+            # While Schleife für eine Runde
             while len(spieler1.spielerqueue) > 0 and len(spieler2.spielerqueue) > 0:
 
-                #Check ob Spieler 1 die Schlacht gewinntt
-                if Kartendeck().karten_dict[spieler1.spielerqueue[0]] > Kartendeck().karten_dict[spieler2.spielerqueue[0]]:
+                # Check ob Spieler 1 die Schlacht gewinntt
+                if (
+                    Kartendeck().karten_dict[spieler1.spielerqueue[0]]
+                    > Kartendeck().karten_dict[spieler2.spielerqueue[0]]
+                ):
                     spieler1.cards_won.append(spieler1.spielerqueue.pop(0))
                     spieler1.cards_won.append(spieler2.spielerqueue.pop(0))
-                    spieler1.cards_won.extend(temp)  
-                    temp.clear()  
-                #Check ob Spieler 2 die Schlacht gewinnt
-                elif Kartendeck().karten_dict[spieler1.spielerqueue[0]] < Kartendeck().karten_dict[spieler2.spielerqueue[0]]:
+                    spieler1.cards_won.extend(temp)
+                    temp.clear()
+                # Check ob Spieler 2 die Schlacht gewinnt
+                elif (
+                    Kartendeck().karten_dict[spieler1.spielerqueue[0]]
+                    < Kartendeck().karten_dict[spieler2.spielerqueue[0]]
+                ):
                     spieler2.cards_won.append(spieler1.spielerqueue.pop(0))
                     spieler2.cards_won.append(spieler2.spielerqueue.pop(0))
-                    spieler2.cards_won.extend(temp)  
-                    temp.clear()  
+                    spieler2.cards_won.extend(temp)
+                    temp.clear()
 
-                #Gleichstand
+                # Gleichstand
                 else:
                     # einfach 3 Karten in Temp und in die nächste Iteration der Runde
-                    if len(spieler1.spielerqueue) >= 3 and len(spieler2.spielerqueue) >= 3:
+                    if (
+                        len(spieler1.spielerqueue) >= 3
+                        and len(spieler2.spielerqueue) >= 3
+                    ):
                         for i in range(3):
                             temp.append(spieler1.spielerqueue.pop(0))
                             temp.append(spieler2.spielerqueue.pop(0))
                     else:
-                        #solange was in der Queue vorhanden ist in Temp rein
+                        # solange was in der Queue vorhanden ist in Temp rein
                         while spieler1.spielerqueue:
                             temp.append(spieler1.spielerqueue.pop(0))
                         while spieler2.spielerqueue:
                             temp.append(spieler2.spielerqueue.pop(0))
-                        
-                        #neuer Stapel machen
-                        spieler1.spielerqueue = self.new_deck(spieler1.spielerqueue, spieler1.cards_won)  
-                        spieler2.spielerqueue = self.new_deck(spieler2.spielerqueue, spieler2.cards_won)  
-                        temp.clear()  
+
+                        # neuer Stapel machen
+                        spieler1.spielerqueue = self.new_deck(
+                            spieler1.spielerqueue, spieler1.cards_won
+                        )
+                        spieler2.spielerqueue = self.new_deck(
+                            spieler2.spielerqueue, spieler2.cards_won
+                        )
+                        temp.clear()
 
                 if len(spieler1.spielerqueue) == 0:
-                    spieler1.spielerqueue = self.new_deck(spieler1.spielerqueue, spieler1.cards_won)  
-                
+                    spieler1.spielerqueue = self.new_deck(
+                        spieler1.spielerqueue, spieler1.cards_won
+                    )
+
                 if len(spieler2.spielerqueue) == 0:
-                    spieler2.spielerqueue = self.new_deck(spieler2.spielerqueue, spieler2.cards_won)  
+                    spieler2.spielerqueue = self.new_deck(
+                        spieler2.spielerqueue, spieler2.cards_won
+                    )
 
         if len(spieler1.spielerqueue) + len(spieler1.cards_won) > 0:
             print(f"{spieler1.name} hat gewonnen")
@@ -159,8 +179,5 @@ class Game:
         self.deck = self.karten_mischen(Kartendeck().karten_dict.keys())
         self.s_name1.spielerqueue = self.deck[:26]
         self.s_name2.spielerqueue = self.deck[26:]
-        self.kriegregeln(self.s_name1, self.s_name2)
-
-
-test = Game("Dan", "Selman")
-test.gamestart()
+        winner = self.kriegregeln(self.s_name1, self.s_name2)
+        return winner
