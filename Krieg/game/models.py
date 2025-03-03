@@ -95,71 +95,60 @@ class Game:
         return items
 
     def new_deck(self, old_deck: list, won_cards: list):
-        for i in won_cards:
-            old_deck.append(i)
-        old_deck = self.karten_mischen(self.deck)
-        won_cards = []
+        old_deck.extend(won_cards) # Selman - besser extend als append 
+        won_cards.clear()  
+        return self.karten_mischen(old_deck)
 
     def kriegregeln(self, spieler1: Spieler, spieler2: Spieler):
-        # Dict für 6 Karten
+
+        # Dict für Unentschieden 
         temp = []
-        counter = 0
-        while (len(spieler1.spielerqueue) and len(spieler2.spielerqueue)) or (
-            len(spieler1.cards_won) and len(spieler2.cards_won)
-        ):
-            counter += 1
-            print(counter)
-            try:
-                spieler1.spielerqueue.remove([])
-                spieler2.spielerqueue.remove([])
-            except ValueError:
-                pass
 
-            while (
-                Kartendeck().karten_dict[spieler1.spielerqueue[0]]
-                == Kartendeck().karten_dict[spieler2.spielerqueue[0]]
-            ):
-                if len(spieler1.spielerqueue) >= 3 and len(spieler2.spielerqueue) >= 3:
-                    # Counter einbauen
-                    for i in range(0, 3):
-                        temp.append(spieler1.spielerqueue.pop(0))
-                        temp.append(spieler2.spielerqueue.pop(0))
+        #While Schleife für ein Spiel
+        while len(spieler1.spielerqueue) + len(spieler1.cards_won) > 0 and len(spieler2.spielerqueue) + len(spieler2.cards_won) > 0:
 
+            #While Schleife für eine Runde
+            while len(spieler1.spielerqueue) > 0 and len(spieler2.spielerqueue) > 0:
+
+                #Check ob Spieler 1 die Schlacht gewinntt
+                if Kartendeck().karten_dict[spieler1.spielerqueue[0]] > Kartendeck().karten_dict[spieler2.spielerqueue[0]]:
+                    spieler1.cards_won.append(spieler1.spielerqueue.pop(0))
+                    spieler1.cards_won.append(spieler2.spielerqueue.pop(0))
+                    spieler1.cards_won.extend(temp)  
+                    temp.clear()  
+                #Check ob Spieler 2 die Schlacht gewinnt
+                elif Kartendeck().karten_dict[spieler1.spielerqueue[0]] < Kartendeck().karten_dict[spieler2.spielerqueue[0]]:
+                    spieler2.cards_won.append(spieler1.spielerqueue.pop(0))
+                    spieler2.cards_won.append(spieler2.spielerqueue.pop(0))
+                    spieler2.cards_won.extend(temp)  
+                    temp.clear()  
+
+                #Gleichstand
                 else:
-                    temp.append(spieler1.spielerqueue.pop(0))
-                    temp.append(spieler2.spielerqueue.pop(0))
-                    self.new_deck(spieler1.spielerqueue, spieler1.cards_won)
-                    self.new_deck(spieler2.spielerqueue, spieler2.cards_won)
+                    # einfach 3 Karten in Temp und in die nächste Iteration der Runde
+                    if len(spieler1.spielerqueue) >= 3 and len(spieler2.spielerqueue) >= 3:
+                        for i in range(3):
+                            temp.append(spieler1.spielerqueue.pop(0))
+                            temp.append(spieler2.spielerqueue.pop(0))
+                    else:
+                        #solange was in der Queue vorhanden ist in Temp rein
+                        while spieler1.spielerqueue:
+                            temp.append(spieler1.spielerqueue.pop(0))
+                        while spieler2.spielerqueue:
+                            temp.append(spieler2.spielerqueue.pop(0))
+                        
+                        #neuer Stapel machen
+                        spieler1.spielerqueue = self.new_deck(spieler1.spielerqueue, spieler1.cards_won)  # 🔴 FIX HIER
+                        spieler2.spielerqueue = self.new_deck(spieler2.spielerqueue, spieler2.cards_won)  # 🔴 FIX HIER
+                        temp.clear()  
 
-            if (
-                Kartendeck().karten_dict[spieler1.spielerqueue[0]]
-                > Kartendeck().karten_dict[spieler2.spielerqueue[0]]
-            ):
+                if len(spieler1.spielerqueue) == 0:
+                    spieler1.spielerqueue = self.new_deck(spieler1.spielerqueue, spieler1.cards_won)  # 🔴 FIX HIER
+                
+                if len(spieler2.spielerqueue) == 0:
+                    spieler2.spielerqueue = self.new_deck(spieler2.spielerqueue, spieler2.cards_won)  # 🔴 FIX HIER
 
-                # hinzufügen ins neue deck von Spieler 1 und aus aktuell deck pop()
-                spieler1.cards_won.append(spieler1.spielerqueue.pop(0))
-                spieler1.cards_won.append(spieler2.spielerqueue.pop(0))
-                spieler1.cards_won.append(temp)
-
-            else:
-
-                # hinzufügen ins neue deck von Spieler 1 und aus aktuell deck pop()
-                spieler2.cards_won.append(spieler1.spielerqueue.pop(0))
-                spieler2.cards_won.append(spieler2.spielerqueue.pop(0))
-                spieler2.cards_won.append(temp)
-
-            if len(spieler1.spielerqueue) == 0:
-                spieler1.spielerqueue = spieler1.cards_won
-                random.shuffle(spieler1.spielerqueue)
-                spieler1.cards_won = []
-
-            if len(spieler2.spielerqueue) == 0:
-                spieler2.spielerqueue = spieler2.cards_won
-                random.shuffle(spieler2.spielerqueue)
-                spieler2.cards_won = []
-
-            temp = []
-        if (len(spieler1.spielerqueue) + len(spieler1.cards_won)) != 0:
+        if len(spieler1.spielerqueue) + len(spieler1.cards_won) > 0:
             print(f"{spieler1.name} hat gewonnen")
             return f"{spieler1.name} gewonnen!"
         else:
@@ -167,8 +156,6 @@ class Game:
             return f"{spieler2.name} hat gewonnen!"
 
     def gamestart(self):
-        # jeder Spieler bekommt 26 Karten in Form von einer Queue
-        # Karten müssen gemischt sein
         self.deck = self.karten_mischen(Kartendeck().karten_dict.keys())
         self.s_name1.spielerqueue = self.deck[:26]
         self.s_name2.spielerqueue = self.deck[26:]
