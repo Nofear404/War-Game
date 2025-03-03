@@ -103,41 +103,39 @@ class Game:
         deck = self.karten_mischen()
         self.s_name1.spielerqueue = deck[:26]
         self.s_name2.spielerqueue = deck[26:]
-    
 
     def kriegregeln(self, spieler1, spieler2):
-        while (len(spieler1.spielerqueue) >= 0 and len(spieler2.spielerqueue)):
-            if (self.kartendeck[spieler1.spielerqueue[0]] > self.kartendeck[spieler2.spielerqueue[0]]):
+        while len(spieler1.spielerqueue) >= 0 and len(spieler2.spielerqueue):
+            # Dict für 6 Karten
+            temp = []
 
-                #hinzufügen ins neue deck von Spieler 1 und aus aktuell deck pop()
+            while (
+                self.kartendeck[spieler1.spielerqueue[0]]
+                == self.kartendeck[spieler2.spielerqueue[0]]
+            ):
+
+                # Counter einbauen
+                for i in range(0, 3):
+                    temp.append(spieler1.spielerqueue.pop(0))
+                    temp.append(spieler2.spielerqueue.pop(0))
+
+            if (
+                self.kartendeck[spieler1.spielerqueue[0]]
+                > self.kartendeck[spieler2.spielerqueue[0]]
+            ):
+
+                # hinzufügen ins neue deck von Spieler 1 und aus aktuell deck pop()
                 spieler1.cards_won.append(spieler1.spielerqueue.pop(0))
                 spieler1.cards_won.append(spieler2.spielerqueue.pop(0))
 
-            elif(self.kartendeck[spieler1.spielerqueue[0]] < self.kartendeck[spieler2.spielerqueue[0]]):
+            elif (
+                self.kartendeck[spieler1.spielerqueue[0]]
+                < self.kartendeck[spieler2.spielerqueue[0]]
+            ):
 
-                #hinzufügen ins neue deck von Spieler 1 und aus aktuell deck pop()
+                # hinzufügen ins neue deck von Spieler 1 und aus aktuell deck pop()
                 spieler2.cards_won.append(spieler1.spielerqueue.pop(0))
                 spieler2.cards_won.append(spieler2.spielerqueue.pop(0))
-
-            else:
-                # Dict für 6 Karten 
-                temp = [] 
-                
-                while (self.kartendeck[spieler1.spielerqueue[0]] == self.kartendeck[spieler2.spielerqueue[0]]):
-     
-
-                    #Counter einbauen 
-                    for i in range(0, 3):
-                        temp.append(spieler1.spielerqueue.pop(0))
-                        temp.append(spieler2.spielerqueue.pop(0))
-                    
-                    
-                
-
-
-            
-        
-        
 
 
 test = Game("Dan", "Selman")
