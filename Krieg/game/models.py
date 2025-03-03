@@ -11,7 +11,7 @@ class Karte:
 
 
 # Kartendeck Klasse
-class Kartendeck(models.Model):
+class Kartendeck:
     def __init__(self):
         self.karten_dict = {
             "Pik 2": 1,
@@ -72,16 +72,16 @@ class Kartendeck(models.Model):
         return self.karten_dict
 
 
-class Spielerdeck:
+class Spieler:
     def __init__(self, name):
         self.name = name
-        self.spielerqueue = Queue()
+        self.spielerqueue = 0
 
 
 class Game:
-    def __init__(self, s_name1, s_name2):
-        self.s_name1 = s_name1
-        self.s_name2 = s_name2
+    def __init__(self, player_1, player_2):
+        self.s_name1 = Spieler(player_1)
+        self.s_name2 = Spieler(player_2)
 
     def karten_mischen(self):
 
@@ -99,7 +99,15 @@ class Game:
     def gamestart(self):
         # jeder Spieler bekommt 26 Karten in Form von einer Queue
         # Karten müssen gemischt sein
-        pass
+        deck = self.karten_mischen()
+        self.s_name1.spielerqueue = deck[:26]
+        self.s_name2.spielerqueue = deck[26:]
 
     def kriegregeln(self):
         pass
+
+
+test = Game("Dan", "Selman")
+test.gamestart()
+print(test.s_name1.spielerqueue)
+print(test.s_name2.spielerqueue)
