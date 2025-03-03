@@ -103,7 +103,3 @@ class Game:
 
     def kriegregeln(self):
         pass
-
-
-test = Game("Dan", "Selman")
-print(test.karten_mischen())
