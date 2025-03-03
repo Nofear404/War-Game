@@ -97,6 +97,15 @@ class Game:
 
         return items
 
+    # nach Ende des Decks werden die gewonnen Karten dem Deck hinzugefügt für die nächste Runde
+    def re_shuffle(self):
+        self.s_name1.spielerqueue.append(self.s_name1.cards_won)
+        self.s_name2.spielerqueue.append(self.s_name2.cards_won)
+        self.s_name1.cards_won = []
+        self.s_name2.cards_won = []
+        random.shuffle(self.s_name1.spielerqueue)
+        random.shuffle(self.s_name2.spielerqueue)
+
     def gamestart(self):
         # jeder Spieler bekommt 26 Karten in Form von einer Queue
         # Karten müssen gemischt sein
